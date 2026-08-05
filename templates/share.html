@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Share My Records{% endblock %}
+
+{% block content %}
+    <h2>Share Your Health Record</h2>
+    <p>Show this QR code to any doctor, or send them this link. No login required for them to view it.</p>
+
+    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code" style="width: 200px; height: 200px;"><br><br>
+
+    <p><strong>Shareable Link:</strong><br>
+    <a href="{{ share_url }}" target="_blank">{{ share_url }}</a></p>
+{% endblock %}

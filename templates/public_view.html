@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Patient Records{% endblock %}
+
+{% block content %}
+    <h2>{{ patient.fullname }}'s Health Record</h2>
+    <p style="color: var(--color-text-muted);">Read-only view — shared via secure link</p>
+
+    {% if patient.allergies or patient.current_medicines %}
+        <div class="visit-card" style="border-left-color: var(--color-error);">
+            {% if patient.dob %}<p><b>Date of Birth:</b> {{ patient.dob }}</p>{% endif %}
+            {% if patient.allergies %}<p><b>⚠ Allergies:</b> {{ patient.allergies }}</p>{% endif %}
+            {% if patient.current_medicines %}<p><b>Current Medicines:</b> {{ patient.current_medicines }}</p>{% endif %}
+        </div>
+    {% endif %}
+
+    {% if visits %}
+        {% for visit in visits %}
+            <div class="visit-card">
+                <p class="visit-date">{{ visit.visit_date }} — Dr. {{ visit.doctor_name }}</p>
+                <p><b>Diagnosis:</b> {{ visit.diagnosis }}</p>
+                <p><b>Medicines:</b> {{ visit.medicines }}</p>
+                <p><b>Advice:</b> {{ visit.advice }}</p>
+                {% if visit.report_url %}
+                    <p><a href="{{ visit.report_url }}" target="_blank">View Report →</a></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No visits recorded yet.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,217 @@
+ /* ============================================
+   DESIGN TOKENS — saari app ke fixed values
+   ============================================ */
+:root {
+    --color-bg: #F7F9FA;
+    --color-card: #FFFFFF;
+    --color-primary: #0F6E66;
+    --color-primary-dark: #0B5952;
+    --color-text: #1C2B33;
+    --color-text-muted: #5B6B73;
+    --color-border: #E2E8ED;
+    --color-error: #C53030;
+    --color-error-bg: #FDEDED;
+
+    --font-heading: 'Lexend', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(28, 43, 51, 0.08), 0 1px 2px rgba(28, 43, 51, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 0;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+    background: var(--color-primary);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+.navbar .brand {
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.nav-links a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.15s ease;
+}
+
+.nav-links a:hover {
+    color: white;
+}
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+.container {
+    max-width: 720px;
+    margin: 2.5rem auto;
+    background: var(--color-card);
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 0.4rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="file"],
+textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: white;
+    margin-bottom: 1.1rem;
+    transition: border-color 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+button,
+.btn {
+    display: inline-block;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+button:hover,
+.btn:hover {
+    background: var(--color-primary-dark);
+}
+
+/* ============================================
+   FLASH MESSAGES
+   ============================================ */
+.flash-messages ul {
+    list-style: none;
+    padding: 0.9rem 1.2rem;
+    margin: 1.5rem auto 0;
+    max-width: 720px;
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.flash-messages li {
+    margin: 0;
+}
+
+/* ============================================
+   VISIT CARDS
+   ============================================ */
+.visit-card {
+    border-left: 3px solid var(--color-primary);
+    background: var(--color-bg);
+    padding: 1.1rem 1.3rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.visit-card .visit-date {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-primary-dark);
+}
+
+.visit-card p {
+    margin: 0.3rem 0;
+    font-size: 0.92rem;
+}
+
+.visit-card a {
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+/* ============================================
+   SEARCH FORM
+   ============================================ */
+.search-form {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.search-form input {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 150px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+    .container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    .search-form {
+        flex-direction: column;
+    }
+}

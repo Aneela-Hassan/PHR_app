@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}My Visits{% endblock %}
+
+{% block content %}
+    <h2>My Visit Records</h2>
+    <p><a href="/add-visit">+ Add New Visit</a></p>
+
+    <form method="GET" action="/my-visits">
+        <input type="text" name="doctor" placeholder="Search by doctor name" value="{{ doctor_query }}">
+        <input type="text" name="condition" placeholder="Search by condition/diagnosis" value="{{ condition_query }}">
+        <input type="date" name="date" value="{{ date_query }}">
+        <button type="submit">Search</button>
+        <a href="/my-visits">Clear</a>
+    </form>
+
+    <hr>
+
+   {% if visits %}
+    {% for visit in visits %}
+        <div class="visit-card">
+            <p class="visit-date">{{ visit.visit_date }} — Dr. {{ visit.doctor_name }}</p>
+            <p><b>Diagnosis:</b> {{ visit.diagnosis }}</p>
+            <p><b>Medicines:</b> {{ visit.medicines }}</p>
+            <p><b>Advice:</b> {{ visit.advice }}</p>
+            {% if visit.report_url %}
+                <p><a href="{{ visit.report_url }}" target="_blank">View Report →</a></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No visits found matching your search.</p>
+{% endif %}
+{% endblock %}

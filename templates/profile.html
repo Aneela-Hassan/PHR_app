@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+    <h2>My Profile</h2>
+    <p style="color: var(--color-text-muted); margin-top: -0.5rem;">
+        This information helps any doctor you share your record with.
+    </p>
+
+    <form method="POST" action="/profile">
+        <label>Date of Birth</label>
+        <input type="date" name="dob" value="{{ user.dob or '' }}">
+
+        <label>Address</label>
+        <input type="text" name="address" value="{{ user.address or '' }}" placeholder="Optional">
+
+        <label>Allergies</label>
+        <textarea name="allergies" rows="2" placeholder="e.g. Penicillin, Peanuts">{{ user.allergies or '' }}</textarea>
+
+        <label>Current Medicines</label>
+        <textarea name="current_medicines" rows="3" placeholder="e.g. Metformin 500mg - once daily">{{ user.current_medicines or '' }}</textarea>
+
+        <button type="submit">Save Profile</button>
+    </form>
+{% endblock %}

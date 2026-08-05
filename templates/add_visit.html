@@ -1,0 +1,38 @@
+ {% extends "base.html" %}
+{% block title %}Add Visit{% endblock %}
+
+{% block content %}
+    <h2>Add a Visit Record</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul style="color: red;">
+                {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/add-visit" enctype="multipart/form-data">
+        <label>Visit Date</label><br>
+        <input type="date" name="visit_date" required><br><br>
+
+        <label>Doctor Name</label><br>
+        <input type="text" name="doctor_name" required><br><br>
+
+        <label>Diagnosis</label><br>
+        <input type="text" name="diagnosis" required><br><br>
+
+        <label>Medicines Prescribed</label><br>
+        <textarea name="medicines" rows="3" placeholder="e.g. Panadol 500mg - twice daily"></textarea><br><br>
+
+        <label>Doctor's Advice</label><br>
+        <textarea name="advice" rows="3"></textarea><br><br>
+
+        <label>Test Report (PDF or Image, optional)</label><br>
+        <input type="file" name="report_file" accept=".pdf,.jpg,.jpeg,.png"><br><br>
+
+        <button type="submit">Save Visit</button>
+    </form>
+{% endblock %}
