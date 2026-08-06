@@ -13,6 +13,7 @@ import qrcode
 import base64
 import io
 from bson import ObjectId
+import certifi
 
 load_dotenv()  # load .env file
 
@@ -26,7 +27,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
 # MongoDB connection
-client = MongoClient(os.getenv("MONGO_URI"))
+client = MongoClient(os.getenv("MONGO_URI"), tlsCAFile=certifi.where())
 db = client["phr_db"]
 
 
