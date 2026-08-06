@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Welcome to your Personal Health Record</h1>
-    <p><a href="/signup">Create an account </a></p>
-    <p><a href="/login">Login </a></p>
-    <p><a href="/logout">Logout</a></p>
-    <p><a href="/share">Get my shareable QR code</a></p>
+    {% if session.user_id %}
+        <h1>Welcome back, {{ session.fullname }}</h1>
+        <p>Your personal health record, all in one place.</p>
+    {% else %}
+        <h1>Welcome to your Personal Health Record</h1>
+        <p>Keep track of every doctor visit, prescription, and test report — and share your history securely with any doctor, anytime.</p>
+    {% endif %}
 {% endblock %}
