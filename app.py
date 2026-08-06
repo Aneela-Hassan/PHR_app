@@ -16,13 +16,11 @@ import qrcode
 import base64
 import io
 from bson import ObjectId
-# IMPORTANT: certifi ko remove kiya hai because Vercel pe issue create karta hai
-# import certifi  # <-- YE COMMENT KAR DIYA (remove kiya)
 
 # ============================================
 # STEP 2: LOAD ENVIRONMENT VARIABLES
 # ============================================
-load_dotenv()  # .env file se variables load karein
+load_dotenv()
 
 # ============================================
 # STEP 3: CLOUDINARY CONFIGURATION
@@ -40,36 +38,15 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
 # ============================================
-# STEP 5: MONGODB CONNECTION - FIXED FOR VERCEL
+# STEP 5: MONGODB CONNECTION - CLEAN & FIXED FOR VERCEL
 # ============================================
-# Yeh connection Vercel pe kaam karega
-# certifi.remove() ki jagah direct SSL options use karein
+mongodb_uri = os.getenv("MONGO_URI")
 
-mongodb_uri = os.getenv("MONGO_URI")  # .env se MONGO_URI read karein
-
-# Connection with proper SSL/TLS settings for Vercel
 client = MongoClient(
     mongodb_uri,
-    # SSL/TLS enable karein
-    tls=True,
-    # Vercel pe certificate validation issues hoti hain, is liye thoda relaxed
-    tlsAllowInvalidCertificates=True,
-    # Timeout settings - zyada time dein
-    serverSelectionTimeoutMS=30000,  # 30 seconds
-    connectTimeoutMS=30000,
-    socketTimeoutMS=30000,
-    # Retry settings
-    retryWrites=True,
-    w='majority'
+    serverSelectionTimeoutMS=5000,
+    connectTimeoutMS=10000
 )
-
-# Test connection - agar fail ho to error show karein
-try:
-    client.admin.command('ping')
-    print("✅ MongoDB Atlas connected successfully on Vercel!")
-except Exception as e:
-    print(f"❌ MongoDB connection failed: {e}")
-    # App chalega lekin database features kaam nahi karenge
 
 # Database select karein
 db = client["phr_db"]
