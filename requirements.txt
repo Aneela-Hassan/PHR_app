@@ -5,5 +5,4 @@ pymongo==4.6.0
 cloudinary==1.35.0
 qrcode==7.4.2
 Pillow==10.1.0
-certifi==2023.11.17
 dnspython==2.5.0

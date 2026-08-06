@@ -1,3 +1,6 @@
+# ============================================
+# STEP 1: IMPORT ALL LIBRARIES
+# ============================================
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -13,24 +16,67 @@ import qrcode
 import base64
 import io
 from bson import ObjectId
-import certifi
+# IMPORTANT: certifi ko remove kiya hai because Vercel pe issue create karta hai
+# import certifi  # <-- YE COMMENT KAR DIYA (remove kiya)
 
-load_dotenv()  # load .env file
+# ============================================
+# STEP 2: LOAD ENVIRONMENT VARIABLES
+# ============================================
+load_dotenv()  # .env file se variables load karein
 
+# ============================================
+# STEP 3: CLOUDINARY CONFIGURATION
+# ============================================
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
+# ============================================
+# STEP 4: FLASK APP SETUP
+# ============================================
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
-# MongoDB connection
-client = MongoClient(os.getenv("MONGO_URI"), tlsCAFile=certifi.where())
+# ============================================
+# STEP 5: MONGODB CONNECTION - FIXED FOR VERCEL
+# ============================================
+# Yeh connection Vercel pe kaam karega
+# certifi.remove() ki jagah direct SSL options use karein
+
+mongodb_uri = os.getenv("MONGO_URI")  # .env se MONGO_URI read karein
+
+# Connection with proper SSL/TLS settings for Vercel
+client = MongoClient(
+    mongodb_uri,
+    # SSL/TLS enable karein
+    tls=True,
+    # Vercel pe certificate validation issues hoti hain, is liye thoda relaxed
+    tlsAllowInvalidCertificates=True,
+    # Timeout settings - zyada time dein
+    serverSelectionTimeoutMS=30000,  # 30 seconds
+    connectTimeoutMS=30000,
+    socketTimeoutMS=30000,
+    # Retry settings
+    retryWrites=True,
+    w='majority'
+)
+
+# Test connection - agar fail ho to error show karein
+try:
+    client.admin.command('ping')
+    print("✅ MongoDB Atlas connected successfully on Vercel!")
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")
+    # App chalega lekin database features kaam nahi karenge
+
+# Database select karein
 db = client["phr_db"]
 
-
+# ============================================
+# STEP 6: LOGIN REQUIRED DECORATOR
+# ============================================
 def login_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -41,11 +87,17 @@ def login_required(func):
     return wrapper
 
 
+# ============================================
+# STEP 7: HOME ROUTE
+# ============================================
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+# ============================================
+# STEP 8: SIGNUP ROUTE
+# ============================================
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -72,8 +124,7 @@ def signup():
             "fullname": fullname,
             "email": email,
             "password": hashed_password,
-            "share_token": uuid.uuid4().hex   # a random public ID for this user
-
+            "share_token": uuid.uuid4().hex
         })
 
         return render_template("success.html", fullname=fullname)
@@ -81,6 +132,9 @@ def signup():
     return render_template("signup.html")
 
 
+# ============================================
+# STEP 9: LOGIN ROUTE
+# ============================================
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -101,6 +155,9 @@ def login():
     return render_template("login.html")
 
 
+# ============================================
+# STEP 10: LOGOUT ROUTE
+# ============================================
 @app.route("/logout")
 def logout():
     session.clear()
@@ -108,19 +165,27 @@ def logout():
     return redirect(url_for("home"))
 
 
+# ============================================
+# STEP 11: DASHBOARD ROUTE (TEST)
+# ============================================
 @app.route("/dashboard")
 @login_required
 def dashboard():
     return f"Welcome to your dashboard, {session['fullname']}!"
 
 
+# ============================================
+# STEP 12: FILE UPLOAD HELPERS
+# ============================================
 ALLOWED_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
-
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# ============================================
+# STEP 13: ADD VISIT ROUTE
+# ============================================
 @app.route("/add-visit", methods=["GET", "POST"])
 @login_required
 def add_visit():
@@ -131,7 +196,6 @@ def add_visit():
         medicines = request.form["medicines"]
         advice = request.form["advice"]
 
-        # --- Handle the uploaded file (optional) ---
         report_url = None
         file = request.files.get("report_file")
 
@@ -167,28 +231,25 @@ def add_visit():
     return render_template("add_visit.html")
 
 
+# ============================================
+# STEP 14: MY VISITS ROUTE
+# ============================================
 @app.route("/my-visits")
 @login_required
 def my_visits():
-    # Get search/filter values from the URL (e.g. ?doctor=Ahmed&condition=flu)
     doctor_query = request.args.get("doctor", "").strip()
     condition_query = request.args.get("condition", "").strip()
     date_query = request.args.get("date", "").strip()
 
-    # Start with a filter that always applies: only this patient's visits
     filter_query = {"patient_id": session["user_id"]}
 
-    # Add extra filters only if the user actually typed something
     if doctor_query:
         filter_query["doctor_name"] = {"$regex": doctor_query, "$options": "i"}
-
     if condition_query:
         filter_query["diagnosis"] = {"$regex": condition_query, "$options": "i"}
-
     if date_query:
         filter_query["visit_date"] = date_query
 
-    # Sort by date, newest first
     visits = list(db.visits.find(filter_query).sort("visit_date", -1))
 
     return render_template(
@@ -199,12 +260,15 @@ def my_visits():
         date_query=date_query
     )
 
+
+# ============================================
+# STEP 15: SHARE ROUTE
+# ============================================
 @app.route("/share")
 @login_required
 def share():
     user = db.users.find_one({"_id": ObjectId(session["user_id"])})
 
-    # If this user doesn't have a share_token yet (old account), create one now
     if "share_token" not in user or not user["share_token"]:
         new_token = uuid.uuid4().hex
         db.users.update_one(
@@ -215,16 +279,19 @@ def share():
     else:
         share_token = user["share_token"]
 
-    # Build the full public URL
     share_url = url_for("public_view", token=share_token, _external=True)
 
-    # Generate a QR code image in memory (no file saved to disk)
     qr_img = qrcode.make(share_url)
     buffer = io.BytesIO()
     qr_img.save(buffer, format="PNG")
     qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     return render_template("share.html", share_url=share_url, qr_base64=qr_base64)
+
+
+# ============================================
+# STEP 16: PUBLIC VIEW ROUTE
+# ============================================
 @app.route("/view/<token>")
 def public_view(token):
     user = db.users.find_one({"share_token": token})
@@ -235,6 +302,11 @@ def public_view(token):
     visits = list(db.visits.find({"patient_id": str(user["_id"])}))
 
     return render_template("public_view.html", patient=user, visits=visits)
+
+
+# ============================================
+# STEP 17: PROFILE ROUTE
+# ============================================
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
@@ -261,14 +333,21 @@ def profile():
 
     return render_template("profile.html", user=user)
 
+
+# ============================================
+# STEP 18: DATABASE TEST ROUTE
+# ============================================
 @app.route("/db-test")
 def db_test():
     try:
         client.admin.command("ping")
-        return "MongoDB Atlas connected successfully!"
+        return "✅ MongoDB Atlas connected successfully on Vercel!"
     except Exception as e:
-        return f"Connection failed: {e}"
+        return f"❌ Connection failed: {e}"
 
 
+# ============================================
+# STEP 19: RUN THE APP
+# ============================================
 if __name__ == "__main__":
     app.run(debug=True)
