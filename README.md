@@ -23,6 +23,14 @@ A patient-owned health record web application. Patients can log their doctor vis
 3. Install dependencies: `pip install -r requirements.txt`
 4. Create a `.env` file with:
 5.  5. Run: `python app.py`
+  
+## Docker
+This app can also be run using Docker:
+`bash
+docker build -t phr-app .
+docker run -p 5001:5000 --env-file .env phr-app
+
+Then visit `http://localhost:5001`
 
 ## Note
 This is a learning/portfolio project — not intended to store real patient data, as it lacks full production-grade security compliance (e.g. email verification is currently format-only, not OTP/link-based).
