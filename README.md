@@ -22,3 +22,7 @@ A patient-owned health record web application. Patients can log their doctor vis
 2. Create a virtual environment: `python -m venv venv`
 3. Install dependencies: `pip install -r requirements.txt`
 4. Create a `.env` file with:
+5.  5. Run: `python app.py`
+
+## Note
+This is a learning/portfolio project — not intended to store real patient data, as it lacks full production-grade security compliance (e.g. email verification is currently format-only, not OTP/link-based).
