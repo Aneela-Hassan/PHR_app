@@ -1,38 +1,106 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Add Visit{% endblock %}
 
 {% block content %}
+<style>
+  .visit-card {
+    background: #ffffff;
+    max-width: 640px;
+    margin: 30px auto;
+    padding: 36px 40px 44px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(20, 40, 80, 0.06);
+    border: 1px solid #eef0f4;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .visit-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .visit-header .icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #0f9d8f, #0b7d72);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px;
+  }
+  .visit-card h2 { font-size: 22px; color: #101828; margin: 0; }
+  .visit-subtitle { color: #667085; font-size: 13.5px; margin: 6px 0 24px 0; }
+  .visit-card label {
+    display: block; font-size: 13.5px; font-weight: 600;
+    color: #344054; margin-bottom: 7px; margin-top: 20px;
+  }
+  .visit-card input[type="date"],
+  .visit-card input[type="text"],
+  .visit-card input[type="file"],
+  .visit-card textarea {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid #e2e6ec; border-radius: 9px;
+    font-size: 14.5px; color: #101828; background: #fbfcfe;
+    font-family: inherit;
+  }
+  .visit-card input:focus, .visit-card textarea:focus {
+    outline: none; border-color: #0f9d8f; background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(15, 157, 143, 0.12);
+  }
+  .visit-card textarea { resize: vertical; min-height: 70px; }
+  .visit-card input[type="file"] { padding: 9px 12px; cursor: pointer; }
+  .file-hint { font-size: 12px; color: #98a2b3; margin-top: 5px; }
+  .flash-list {
+    list-style: none; margin: 0 0 20px 0; padding: 0;
+  }
+  .flash-list li {
+    background: #fee4e2; color: #b42318;
+    padding: 10px 14px; border-radius: 8px;
+    font-size: 13px; margin-bottom: 8px;
+  }
+  .visit-actions { margin-top: 32px; }
+  .btn-save {
+    width: 100%; padding: 12px 18px; border-radius: 9px;
+    font-size: 14.5px; font-weight: 600; cursor: pointer;
+    border: none; background: #0f9d8f; color: white;
+    box-shadow: 0 2px 8px rgba(15, 157, 143, 0.25);
+  }
+  .btn-save:hover { background: #0b7d72; }
+</style>
+
+<div class="visit-card">
+  <div class="visit-header">
+    <div class="icon">🩺</div>
     <h2>Add a Visit Record</h2>
+  </div>
+  <p class="visit-subtitle">Fill in the details of this doctor visit to keep your health timeline up to date.</p>
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul style="color: red;">
-                {% for msg in messages %}
-                    <li>{{ msg }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flash-list">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
-    <form method="POST" action="/add-visit" enctype="multipart/form-data">
-        <label>Visit Date</label><br>
-        <input type="date" name="visit_date" required><br><br>
+  <form method="POST" action="{{ url_for('add_visit') }}" enctype="multipart/form-data">
+    <label>Visit Date</label>
+    <input type="date" name="visit_date" required>
 
-        <label>Doctor Name</label><br>
-        <input type="text" name="doctor_name" required><br><br>
+    <label>Doctor Name</label>
+    <input type="text" name="doctor_name" placeholder="e.g. Dr. Ahsan Raza" required>
 
-        <label>Diagnosis</label><br>
-        <input type="text" name="diagnosis" required><br><br>
+    <label>Diagnosis</label>
+    <input type="text" name="diagnosis" placeholder="e.g. Seasonal flu" required>
 
-        <label>Medicines Prescribed</label><br>
-        <textarea name="medicines" rows="3" placeholder="e.g. Panadol 500mg - twice daily"></textarea><br><br>
+    <label>Medicines Prescribed</label>
+    <textarea name="medicines" rows="3" placeholder="e.g. Panadol 500mg - twice daily"></textarea>
 
-        <label>Doctor's Advice</label><br>
-        <textarea name="advice" rows="3"></textarea><br><br>
+    <label>Doctor's Advice</label>
+    <textarea name="advice" rows="3" placeholder="e.g. Rest for 3 days, drink plenty of fluids"></textarea>
 
-        <label>Test Report (PDF or Image, optional)</label><br>
-        <input type="file" name="report_file" accept=".pdf,.jpg,.jpeg,.png"><br><br>
+    <label>Test Report (PDF or Image, optional)</label>
+    <input type="file" name="report_file" accept=".pdf,.jpg,.jpeg,.png">
+    <div class="file-hint">Accepted formats: PDF, JPG, PNG</div>
 
-        <button type="submit">Save Visit</button>
-    </form>
+    <div class="visit-actions">
+      <button type="submit" class="btn-save">Save Visit Record</button>
+    </div>
+  </form>
+</div>
 {% endblock %}
